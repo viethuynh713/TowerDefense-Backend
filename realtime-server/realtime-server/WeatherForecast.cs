@@ -1,4 +1,4 @@
-namespace game_backend
+namespace realtime_server
 {
     public class WeatherForecast
     {

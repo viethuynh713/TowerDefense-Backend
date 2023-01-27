@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace game_backend.Controllers
+namespace realtime_server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
