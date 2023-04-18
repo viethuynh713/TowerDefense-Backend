@@ -5,12 +5,14 @@ namespace Service.Models
 {
     public class Users
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
+        //[BsonId]
+        //[BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
-        [BsonElement("userId")]
+       // [BsonElement("userId")]
         public string userId { get; set; } = null!;
+
+        public string password { get; set; } = null!;
 
         public string? nickName { get; set; }
 
