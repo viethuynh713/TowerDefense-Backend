@@ -5,9 +5,9 @@ using Service.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Todo
-builder.Services.Configure<UserProfileDatabaseSettings>(
-    builder.Configuration.GetSection("OnlineUserProfile"));
-builder.Services.AddSingleton<UserProfileService>();
+builder.Services.Configure<UsersDatabaseSettings>(
+    builder.Configuration.GetSection("MythicEmpire"));
+builder.Services.AddSingleton<UsersService>();
 
 
 
