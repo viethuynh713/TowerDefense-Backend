@@ -5,10 +5,10 @@ using Service.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Todo
-builder.Services.Configure<UsersDatabaseSettings>(
+builder.Services.Configure<DatabaseSettings>(
     builder.Configuration.GetSection("MythicEmpire"));
-builder.Services.AddSingleton<UsersService>();
-
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<GameSessionService>();
 
 
 

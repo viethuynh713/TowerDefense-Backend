@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Service.Models
 {
-    public class Users
+    public class UserModel
     {
         [BsonId]
         [DataMember]
@@ -13,9 +13,9 @@ namespace Service.Models
         public string password { get; set; } = null!;
         public string userId { get; set; } = null!;
         public string? nickName { get; set; }
-        public decimal currency { get; set; } = 0;
-        public List<int>? cards { get; set; }
-        public List<string>? friends { get; set; }
+        public int gold { get; set; } = 0;
+        public List<int>? cardListID { get; set; }
+        public List<string>? friendListID { get; set; }
 
     }
 }
