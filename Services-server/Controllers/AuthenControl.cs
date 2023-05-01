@@ -8,25 +8,25 @@ namespace Service.Controllers;
 [Route("api/[controller]")]
 public class AuthenControl : ControllerBase
 {
-    private readonly UserService _usersService;
+    private readonly UserService _userService;
 
     public AuthenControl(UserService usersService) =>
-        _usersService = usersService;
+        _userService = usersService;
 
     [HttpGet]
     public async Task<List<UserModel>> Get() =>
-        await _usersService.GetAsync();
+        await _userService.GetAsync();
 
     [HttpGet]
     [Route("delete")]
     public async Task Delete(string userId) =>
-        await _usersService.RemoveAsync(userId);
+        await _userService.RemoveAsync(userId);
 
     [HttpPost]
     [Route("register")]
     public async Task<IActionResult> Register(string email, string nickName, string password)
     {
-        var user = await _usersService.GetUserByEmailAsync(email);
+        var user = await _userService.GetUserByEmailAsync(email);
         if (user is not null)
         {
             return BadRequest("Username already exists");
@@ -43,7 +43,7 @@ public class AuthenControl : ControllerBase
             friendListID = new List<string>()
         };
 
-        await _usersService.CreateUserAsync(newUser);
+        await _userService.CreateUserAsync(newUser);
         return Ok(newUser);
     }
 
@@ -51,7 +51,7 @@ public class AuthenControl : ControllerBase
     [Route("login")]
     public async Task<IActionResult> Login(string email, string userPassword)
     {
-        var user = await _usersService.GetUserByEmailPasswordAsync(email, userPassword);
+        var user = await _userService.GetUserByEmailPasswordAsync(email, userPassword);
         if (user is null)
         {
             return BadRequest("Username or password is incorrect");
@@ -63,7 +63,7 @@ public class AuthenControl : ControllerBase
     [Route("resetpw")]
     public async Task<IActionResult> ChangePassword(string email, string oldPassword, string newPassword)
     {
-        var oldUser = await _usersService.GetUserByEmailAsync(email);
+        var oldUser = await _userService.GetUserByEmailAsync(email);
 
         if (oldUser is null)
         {
@@ -75,7 +75,7 @@ public class AuthenControl : ControllerBase
             return BadRequest("Wrong password");
         }    
 
-        await _usersService.ChangePassword(email, newPassword);
+        await _userService.ChangePassword(email, newPassword);
 
         return Ok();
     }

@@ -9,13 +9,13 @@ namespace Service.Controllers;
 [Route("api/[controller]")]
 public class UserControl : ControllerBase
 {
-    private readonly UserService _userModelService;
+    private readonly UserService _userService;
 
     private readonly GameSessionService _gameSessionService;
 
     public UserControl(UserService usersService, GameSessionService gameSessionService)
     {
-        _userModelService = usersService;
+        _userService = usersService;
         _gameSessionService = gameSessionService;
     }
        
@@ -24,14 +24,14 @@ public class UserControl : ControllerBase
     [Route("updatenickname")]
     public async Task<IActionResult> UpdateNickName(string userId, string newName)
     {
-        var user = await _userModelService.GetUserByUserIdAsync(userId);
+        var user = await _userService.GetUserByUserIdAsync(userId);
 
         if (user is null)
         {
             return NotFound();
         }
 
-        await _userModelService.ChangeNickname(userId, newName);
+        await _userService.ChangeNickname(userId, newName);
 
         return Ok();
     }
@@ -40,7 +40,7 @@ public class UserControl : ControllerBase
     [Route("addgold")]
     public async Task<IActionResult> AddGold(string userId, int addedGold)
     {
-        var user = await _userModelService.GetUserByUserIdAsync(userId);
+        var user = await _userService.GetUserByUserIdAsync(userId);
 
         if (user is null)
         {
@@ -49,7 +49,7 @@ public class UserControl : ControllerBase
 
         var newGold = user.gold + addedGold;
 
-        await _userModelService.UpdateGold(userId, newGold);
+        await _userService.UpdateGold(userId, newGold);
 
         return Ok();
     }
