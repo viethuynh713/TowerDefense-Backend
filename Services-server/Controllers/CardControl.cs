@@ -15,6 +15,30 @@ public class CardControl : ControllerBase
         _userService = usersService;
     }
 
+    [HttpGet]
+    public async Task<List<CardModel>> GetAllCards() =>
+        await _userService.GetAllCardsAsync();
+
+    [HttpPost]
+    [Route("addcard")]
+    public async Task<IActionResult> AddCard(string cardId, string cardName, int cardLevel)
+    {
+        var card = await _userService.GetCard(cardId, cardName, cardLevel);
+        if (card is not null) 
+        {
+            return BadRequest("Duplicate card !");
+        }
+        var newCard = new CardModel
+        {
+            cardId = cardId,
+            cardName = cardName,
+            cardLevel = cardLevel
+        };
+
+        await _userService.CreateCardAsync(newCard);
+        return Ok(newCard);
+    }
+
     [HttpPost]
     [Route("upgradecard")]
     public async Task<IActionResult> UpgradeCard(string userId, int cardId)

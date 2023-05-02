@@ -14,8 +14,8 @@ public class AuthenControl : ControllerBase
         _userService = usersService;
 
     [HttpGet]
-    public async Task<List<UserModel>> Get() =>
-        await _userService.GetAsync();
+    public async Task<List<UserModel>> GetAll() =>
+        await _userService.GetAllUsersAsync();
 
     [HttpGet]
     [Route("delete")]

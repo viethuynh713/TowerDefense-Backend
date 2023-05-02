@@ -9,5 +9,7 @@
         public string UserModelCollectionName { get; set; } = null!;
 
         public string GameSessionModelCollectionName { get; set; } = null!;
+
+        public string CardModelCollectionName { get; set; } = null!;
     }
 }

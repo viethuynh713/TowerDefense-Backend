@@ -9,6 +9,8 @@ public class UserService
 {
     private readonly IMongoCollection<UserModel> _userModelCollection;
 
+    private readonly IMongoCollection<CardModel> _cardModelCollection;
+
     private int CalculateNextCardLevel(int cardId)
     {
         return cardId + 10; // test only, will do when listcard becomes available
@@ -37,10 +39,19 @@ public class UserService
 
         _userModelCollection = mongoDatabase.GetCollection<UserModel>(
             databaseSettings.Value.UserModelCollectionName);
+
+        _cardModelCollection = mongoDatabase.GetCollection<CardModel>(
+            databaseSettings.Value.CardModelCollectionName);
     }
 
-    public async Task<List<UserModel>> GetAsync() =>
+    public async Task<List<UserModel>> GetAllUsersAsync() =>
         await _userModelCollection.Find(_ => true).ToListAsync();
+
+    public async Task<List<CardModel>> GetAllCardsAsync() =>
+        await _cardModelCollection.Find(_ => true).ToListAsync();
+
+    public async Task CreateCardAsync(CardModel newCard) =>
+        await _cardModelCollection.InsertOneAsync(newCard);
 
     public async Task RemoveAsync(string userId) =>
         await _userModelCollection.DeleteOneAsync(x => x.userId == userId);
@@ -48,21 +59,24 @@ public class UserService
     public async Task CreateUserAsync(UserModel newUser) =>
         await _userModelCollection.InsertOneAsync(newUser);
     // Get User method
-    public async Task<UserModel?> GetUserByEmailAsync(string i_email) =>
-        await _userModelCollection.Find(x => x.email == i_email).FirstOrDefaultAsync();
+    public async Task<UserModel?> GetUserByEmailAsync(string email) =>
+        await _userModelCollection.Find(x => x.email == email).FirstOrDefaultAsync();
 
     public async Task<UserModel?> GetUserByUserIdAsync(string userId) =>
         await _userModelCollection.Find(x => x.userId == userId).FirstOrDefaultAsync();
 
-    public async Task<UserModel?> GetUserByEmailPasswordAsync(string i_email, string i_password) =>
-        await _userModelCollection.Find(x => x.email == i_email && x.password == i_password).FirstOrDefaultAsync();
+    public async Task<UserModel?> GetUserByEmailPasswordAsync(string email, string password) =>
+        await _userModelCollection.Find(x => x.email == email && x.password == password).FirstOrDefaultAsync();
 
+
+    public async Task<CardModel?> GetCard(string cardId, string cardName, int cardLevel) =>
+        await _cardModelCollection.Find(x => x.cardId == cardId || x.cardName == cardName && x.cardLevel == cardLevel).FirstOrDefaultAsync();
     // Change and update method
-    public async Task ChangePassword(string i_email, string i_newPassword) 
+    public async Task ChangePassword(string email, string newPassword) 
     {
-        var filter = Builders<UserModel>.Filter.Eq(x => x.email, i_email);
+        var filter = Builders<UserModel>.Filter.Eq(x => x.email, email);
         var update = Builders<UserModel>.Update
-            .Set(x => x.password, i_newPassword);
+            .Set(x => x.password, newPassword);
 
         await _userModelCollection.UpdateOneAsync(filter, update);
     }
@@ -96,6 +110,13 @@ public class UserService
             .Set(x => x.cardListID, list);
 
         await _userModelCollection.UpdateOneAsync(filter, update);
+    }
+
+    public async Task BuyCard(string userId, int cardId)
+    {
+        var filter = Builders<UserModel>.Filter.Eq(x => x.userId, userId);
+        var user = await _userModelCollection.Find(filter).FirstOrDefaultAsync();
+        var price = cardId * 100;
     }
 
     public async Task<int> BuyGacha(string userId, int packType)
