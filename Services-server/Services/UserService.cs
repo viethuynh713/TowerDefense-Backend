@@ -69,8 +69,8 @@ public class UserService
         await _userModelCollection.Find(x => x.email == email && x.password == password).FirstOrDefaultAsync();
 
 
-    public async Task<CardModel?> GetCard(string cardId, string cardName, int cardLevel) =>
-        await _cardModelCollection.Find(x => x.cardId == cardId || x.cardName == cardName && x.cardLevel == cardLevel).FirstOrDefaultAsync();
+    public async Task<CardModel?> GetCard(string cardId) =>
+        await _cardModelCollection.Find(x => x.CardId == cardId ).FirstOrDefaultAsync();
     // Change and update method
     public async Task ChangePassword(string email, string newPassword) 
     {

@@ -21,20 +21,21 @@ public class CardControl : ControllerBase
 
     [HttpPost]
     [Route("addcard")]
-    public async Task<IActionResult> AddCard(string cardId, string cardName, int cardLevel)
+    public async Task<IActionResult> AddCard([FromBody] CardModel newCard)
     {
-        var card = await _userService.GetCard(cardId, cardName, cardLevel);
-        if (card is not null) 
+        if (!ModelState.IsValid)
         {
-            return BadRequest("Duplicate card !");
-        }
-        var newCard = new CardModel
-        {
-            cardId = cardId,
-            cardName = cardName,
-            cardLevel = cardLevel
-        };
+            return BadRequest();
 
+        }
+        if (newCard.CardId != null)
+        {
+            var card = await _userService.GetCard(newCard.CardId);
+            if (card is not null) 
+            {
+                return BadRequest("Duplicate card !");
+            }
+        }
         await _userService.CreateCardAsync(newCard);
         return Ok(newCard);
     }
