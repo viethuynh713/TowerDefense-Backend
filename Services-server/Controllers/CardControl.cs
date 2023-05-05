@@ -8,40 +8,45 @@ namespace Service.Controllers;
 [Route("api/[controller]")]
 public class CardControl : ControllerBase
 {
-    public readonly UserService _userService;
+    public readonly IUserService _userService;
 
-    public CardControl(UserService usersService)
+    public readonly ICardService _cardService;
+
+    public CardControl(IUserService usersService, ICardService cardService)
     {
         _userService = usersService;
+        _cardService = cardService;
     }
 
     [HttpGet]
     public async Task<List<CardModel>> GetAllCards() =>
-        await _userService.GetAllCardsAsync();
+        await _cardService.GetAllCardsAsync();
 
     [HttpPost]
     [Route("addcard")]
-    public async Task<IActionResult> AddCard(string cardId, string cardName, int cardLevel)
+    public async Task<IActionResult> AddCard(string cardId, string cardName, int cardStar, CardType typeOfCard, RarityCard cardRarity)
     {
-        var card = await _userService.GetCard(cardId, cardName, cardLevel);
+        var card = await _cardService.GetCard(cardId);
         if (card is not null) 
         {
-            return BadRequest("Duplicate card !");
+            return BadRequest("Duplicated card !");
         }
         var newCard = new CardModel
         {
-            cardId = cardId,
-            cardName = cardName,
-            cardLevel = cardLevel
+            CardId = cardId,
+            CardName = cardName,
+            CardStar = cardStar,
+            CardRarity = cardRarity,
+            TypeOfCard = typeOfCard
         };
 
-        await _userService.CreateCardAsync(newCard);
+        await _cardService.CreateCardAsync(newCard);
         return Ok(newCard);
     }
 
     [HttpPost]
     [Route("upgradecard")]
-    public async Task<IActionResult> UpgradeCard(string userId, int cardId)
+    public async Task<IActionResult> UpgradeCard(string userId, string oldCardId)
     {
         var user = await _userService.GetUserByUserIdAsync(userId);
         if (user is null)
@@ -49,9 +54,16 @@ public class CardControl : ControllerBase
             return NotFound();
         }
 
-        await _userService.UpgradeCard(userId, cardId);
+        if (!user.cardListID.Contains(oldCardId))
+        {
+            return BadRequest("Error when trying to get card info");
+        }
+
+        var newCardId = await _cardService.GetUpgradedCardId(oldCardId);
+
+        await _userService.UpgradeCard(userId, oldCardId, newCardId);
         
-        return Ok();
+        return Ok(newCardId);
     }
 
     [HttpPost]
@@ -63,8 +75,14 @@ public class CardControl : ControllerBase
         {
             return NotFound();
         }
-        var receivedCard = await _userService.BuyGacha(userId, packType);
-        return Ok(receivedCard);
+
+        if (user.gold < _cardService.GetPriceOfGachaPack(packType))
+        {
+            return BadRequest("Not enough gold for this transaction!");
+        }
+
+        var receivedCardId = await _cardService.GenerateCardId(packType);
+        return Ok(receivedCardId);
     }
 
 }

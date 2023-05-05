@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Services;
 using Service.Models;
+using System.Text.RegularExpressions;
 
 namespace Service.Controllers;
 
@@ -8,7 +9,7 @@ namespace Service.Controllers;
 [Route("api/[controller]")]
 public class AuthenControl : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
     public AuthenControl(UserService usersService) =>
         _userService = usersService;
@@ -26,10 +27,21 @@ public class AuthenControl : ControllerBase
     [Route("register")]
     public async Task<IActionResult> Register(string email, string nickName, string password)
     {
+
+        if (!_userService.IsValidEmail(email))
+        {
+            return BadRequest("Wrong email format !");
+        }
+
+        if (!await _userService.IsNickNameValid(nickName))
+        {
+            return BadRequest("Nickname is already used !");
+        }
+
         var user = await _userService.GetUserByEmailAsync(email);
         if (user is not null)
         {
-            return BadRequest("Username already exists");
+            return BadRequest("This email is already used !");
         }
 
         var newUser = new UserModel
@@ -39,22 +51,27 @@ public class AuthenControl : ControllerBase
             userId = Guid.NewGuid().ToString(),
             nickName = nickName,
             gold = 0,
-            cardListID = new List<int>(),
+            cardListID = new List<string>(), //todo: 4 card (CardStar = 0, CardRarity = 1)
             friendListID = new List<string>()
         };
 
         await _userService.CreateUserAsync(newUser);
-        return Ok(newUser);
+        return Ok("Register user successfully !");
     }
 
     [HttpGet]
     [Route("login")]
     public async Task<IActionResult> Login(string email, string userPassword)
     {
+        if (!_userService.IsValidEmail(email))
+        {
+            return BadRequest("Wrong email format !");
+        }
+        
         var user = await _userService.GetUserByEmailPasswordAsync(email, userPassword);
         if (user is null)
         {
-            return BadRequest("Username or password is incorrect");
+            return BadRequest("Email or password is incorrect");
         }
         return Ok(user);
     }

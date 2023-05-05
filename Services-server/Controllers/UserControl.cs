@@ -9,11 +9,11 @@ namespace Service.Controllers;
 [Route("api/[controller]")]
 public class UserControl : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    private readonly GameSessionService _gameSessionService;
+    private readonly IGameSessionService _gameSessionService;
 
-    public UserControl(UserService usersService, GameSessionService gameSessionService)
+    public UserControl(IUserService usersService, IGameSessionService gameSessionService)
     {
         _userService = usersService;
         _gameSessionService = gameSessionService;
@@ -24,6 +24,11 @@ public class UserControl : ControllerBase
     [Route("updatenickname")]
     public async Task<IActionResult> UpdateNickName(string userId, string newName)
     {
+        if (!await _userService.IsNickNameValid(newName)) 
+        {
+            return BadRequest("Nickname is already used !");
+        }
+   
         var user = await _userService.GetUserByUserIdAsync(userId);
 
         if (user is null)
@@ -51,7 +56,7 @@ public class UserControl : ControllerBase
 
         await _userService.UpdateGold(userId, newGold);
 
-        return Ok();
+        return Ok(newGold);
     }
     [HttpPost]
     [Route("creategamesession")]
