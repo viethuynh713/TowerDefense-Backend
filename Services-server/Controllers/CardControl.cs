@@ -12,9 +12,9 @@ public class CardControl : ControllerBase
 
     public readonly ICardService _cardService;
 
-    public CardControl(IUserService usersService, ICardService cardService)
+    public CardControl(UserService userService, CardService cardService)
     {
-        _userService = usersService;
+        _userService = userService;
         _cardService = cardService;
     }
 
@@ -24,22 +24,21 @@ public class CardControl : ControllerBase
 
     [HttpPost]
     [Route("addcard")]
-    public async Task<IActionResult> AddCard(string cardId, string cardName, int cardStar, CardType typeOfCard, RarityCard cardRarity)
+    public async Task<IActionResult> AddCard([FromBody] CardModel newCard)
     {
-        var card = await _cardService.GetCard(cardId);
-        if (card is not null) 
+        if (!ModelState.IsValid)
         {
-            return BadRequest("Duplicated card !");
-        }
-        var newCard = new CardModel
-        {
-            CardId = cardId,
-            CardName = cardName,
-            CardStar = cardStar,
-            CardRarity = cardRarity,
-            TypeOfCard = typeOfCard
-        };
+            return BadRequest();
 
+        }
+        if (newCard.CardId != null)
+        {
+            var card = await _cardService.GetCard(newCard.CardId);
+            if (card is not null)
+            {
+                return BadRequest("Duplicate card !");
+            }
+        }
         await _cardService.CreateCardAsync(newCard);
         return Ok(newCard);
     }
@@ -62,7 +61,7 @@ public class CardControl : ControllerBase
         var newCardId = await _cardService.GetUpgradedCardId(oldCardId);
 
         await _userService.UpgradeCard(userId, oldCardId, newCardId);
-        
+
         return Ok(newCardId);
     }
 

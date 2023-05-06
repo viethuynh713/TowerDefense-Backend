@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<DatabaseSettings>(
     builder.Configuration.GetSection("MythicEmpire"));
 builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<CardService>();
 builder.Services.AddSingleton<GameSessionService>();
 
 

@@ -6,7 +6,7 @@ using MongoDB.Bson;
 namespace Service.Services;
 
 
-public class CardService
+public class CardService : ICardService
 {
     private readonly IMongoCollection<CardModel> _cardModelCollection;
 

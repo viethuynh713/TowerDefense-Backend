@@ -5,7 +5,7 @@ using MongoDB.Driver;
 namespace Service.Services;
 
 
-public class GameSessionService
+public class GameSessionService : IGameSessionService
 {
     private readonly IMongoCollection<GameSessionModel>? _gameSessionModelCollection;
     public GameSessionService(

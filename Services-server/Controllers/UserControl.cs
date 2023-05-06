@@ -13,9 +13,9 @@ public class UserControl : ControllerBase
 
     private readonly IGameSessionService _gameSessionService;
 
-    public UserControl(IUserService usersService, IGameSessionService gameSessionService)
+    public UserControl(UserService userService, GameSessionService gameSessionService)
     {
-        _userService = usersService;
+        _userService = userService;
         _gameSessionService = gameSessionService;
     }
        

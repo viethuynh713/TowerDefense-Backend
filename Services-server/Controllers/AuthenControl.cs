@@ -11,8 +11,8 @@ public class AuthenControl : ControllerBase
 {
     private readonly IUserService _userService;
 
-    public AuthenControl(UserService usersService) =>
-        _userService = usersService;
+    public AuthenControl(UserService userService) =>
+        _userService = userService;
 
     [HttpGet]
     public async Task<List<UserModel>> GetAll() =>
