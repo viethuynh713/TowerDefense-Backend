@@ -35,4 +35,11 @@ namespace Service.Models
         Mythic,
         Legend
     }
+    public enum GachaType
+    {
+        None,
+        Common,
+        Rare,
+        Legend
+    }
 }

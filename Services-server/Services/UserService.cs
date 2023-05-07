@@ -90,13 +90,13 @@ public class UserService : IUserService
         await _userModelCollection.UpdateOneAsync(filter, update);
     }
 
-    public async Task UpgradeCard(string userId, string oldCardId, string newCardId)
+    public async Task UpgradeCard(string userId, string oldCardId, string? newCardId)
     {
         var filter = Builders<UserModel>.Filter.Eq(x => x.userId, userId);
         var user = await _userModelCollection.Find(filter).FirstOrDefaultAsync();
         var list = user.cardListID;
-        list.Remove(oldCardId);
-        list.Add(newCardId);
+        list?.Remove(oldCardId);
+        if (newCardId != null) list?.Add(newCardId);
 
         var update = Builders<UserModel>.Update
             .Set(x => x.cardListID, list);

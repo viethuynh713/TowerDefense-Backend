@@ -8,12 +8,12 @@ namespace Service.Services
         Task<List<CardModel>> GetAllCardsAsync();
 
         Task CreateCardAsync(CardModel newCard);
-        int GetPriceOfGachaPack(int packType);
+        int GetPriceOfGachaPack(GachaType packType);
 
         Task<CardModel?> GetCard(string cardId);
 
-        Task<string> GetUpgradedCardId(string cardId);
+        Task<string?> GetUpgradedCardId(string cardId);
 
-        Task<string?> GenerateCardId(int packType);
+        Task<string?> GenerateCardId(GachaType packType);
     }
 }

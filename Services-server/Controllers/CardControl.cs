@@ -23,7 +23,7 @@ public class CardControl : ControllerBase
         await _cardService.GetAllCardsAsync();
 
     [HttpPost]
-    [Route("addcard")]
+    [Route("add-card-to-database")]
     public async Task<IActionResult> AddCard([FromBody] CardModel newCard)
     {
         if (!ModelState.IsValid)
@@ -43,9 +43,9 @@ public class CardControl : ControllerBase
         return Ok(newCard);
     }
 
-    [HttpPost]
-    [Route("upgradecard")]
-    public async Task<IActionResult> UpgradeCard(string userId, string oldCardId)
+    [HttpPut]
+    [Route("upgrade-card/{userId}")]
+    public async Task<IActionResult> UpgradeCard(string userId, [FromForm]string oldCardId)
     {
         var user = await _userService.GetUserByUserIdAsync(userId);
         if (user is null)
@@ -58,16 +58,27 @@ public class CardControl : ControllerBase
             return BadRequest("Error when trying to get card info");
         }
 
+        var oldCard = await _cardService.GetCard(oldCardId);
+
+        var price = GetUpdatePrice(oldCard.CardStar);
+        if (user.gold < price)
+        {
+            return BadRequest("Not enough gold for this transaction!");
+        }
         var newCardId = await _cardService.GetUpgradedCardId(oldCardId);
 
+        if (newCardId is null)
+        {
+            return BadRequest("The card is max level");
+        }
         await _userService.UpgradeCard(userId, oldCardId, newCardId);
-
-        return Ok(newCardId);
+        await _userService.UpdateGold(userId, user.gold - price);
+        return Ok(await _userService.GetUserByUserIdAsync(userId));
     }
 
     [HttpPost]
-    [Route("buygacha")]
-    public async Task<IActionResult> BuyGacha(string userId, int packType)
+    [Route("buy-gacha/{userId}")]
+    public async Task<IActionResult> BuyGacha(string userId, [FromForm]GachaType packType)
     {
         var user = await _userService.GetUserByUserIdAsync(userId);
         if (user is null)
@@ -75,13 +86,72 @@ public class CardControl : ControllerBase
             return NotFound();
         }
 
-        if (user.gold < _cardService.GetPriceOfGachaPack(packType))
+        int pricePack = _cardService.GetPriceOfGachaPack(packType);
+        if (user.gold < pricePack)
         {
             return BadRequest("Not enough gold for this transaction!");
         }
 
         var receivedCardId = await _cardService.GenerateCardId(packType);
-        return Ok(receivedCardId);
+        if (receivedCardId != null)
+        {
+            await _userService.AddCard(userId, receivedCardId);
+            await _userService.UpdateGold(userId, user.gold - pricePack);
+            return Ok(await _userService.GetUserByUserIdAsync(userId));
+        }
+
+        return BadRequest();
     }
 
+    [HttpPost]
+    [Route("buy-card/{userId}")]
+    public async Task<IActionResult> BuyGacha([FromRoute]string userId, [FromForm]string cardId)
+    {
+        var user = await _userService.GetUserByUserIdAsync(userId);
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        var card = await _cardService.GetCard(cardId);
+        if (card is null)
+        {
+            return NotFound();
+        }
+        var price = GetBuyPrice(card.CardRarity);
+        if (user.gold < price)
+        {
+            return BadRequest("Not enough gold for this transaction!");
+        }
+        await _userService.AddCard(userId, cardId);
+        await _userService.UpdateGold(userId, user.gold - price);
+        return Ok(await _userService.GetUserByUserIdAsync(userId));
+    }
+
+    private int GetBuyPrice(RarityCard cardCardRarity)
+    {
+        switch (cardCardRarity)
+        {
+            case RarityCard.Common : return 200;
+            case RarityCard.Rare : return 400;
+            case RarityCard.Mythic : return 600;
+            case RarityCard.Legend : return 800;
+        }
+
+        return -1;
+    }
+
+    private int GetUpdatePrice(int star)
+    {
+        switch (star)
+        {
+            case 0: return 50;
+            case 1: return 100;
+            case 2: return 200;
+            case 3: return 300;
+            case 4: return 500;
+        }
+
+        return -1;
+    }
 }

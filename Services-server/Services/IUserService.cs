@@ -25,9 +25,9 @@ namespace Service.Services
 
         Task UpdateGold(string userId, int newGold);
 
-        Task UpgradeCard(string userId, string oldCardId, string newCardId);
+        Task UpgradeCard(string userId, string oldCardId, string? newCardId);
 
         Task AddCard(string userId, string newCardId);
-
+        
     }
 }

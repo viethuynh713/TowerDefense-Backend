@@ -28,35 +28,35 @@ public class CardService : ICardService
     public async Task CreateCardAsync(CardModel newCard) =>
         await _cardModelCollection.InsertOneAsync(newCard);
 
-    private List<int> GetRateList(int packType)
+    private List<int> GetRateList(GachaType packType)
     {
         switch(packType)
         {
-            case 0: return new List<int>() { 70, 25, 5 };
-            case 1: return new List<int>() { 40, 50, 10 };
-            case 2: return new List<int>() { 10, 75, 15 };
+            case GachaType.Common: return new List<int>() { 70, 25, 5, 0 };
+            case GachaType.Rare: return new List<int>() { 40, 50, 8, 2 };
+            case GachaType.Legend: return new List<int>() { 10, 75, 10, 5 };
             default: return new List<int>() { };
         }
     }
 
-    public int GetPriceOfGachaPack(int packType)
+    public int GetPriceOfGachaPack(GachaType packType)
     {
         switch (packType)
         {
-            case 0: return 200;
-            case 1: return 400;
-            case 2: return 600;
+            case GachaType.Common: return 200;
+            case GachaType.Rare: return 400;
+            case GachaType.Legend: return 600;
             default: return -1;
         }
     }
 
-    //random
-    private async Task<string> CalculateNextCardLevel(string oldCardId)
+    
+    private async Task<string?> CalculateNextCardLevel(string oldCardId)
     {
         var oldCard = await _cardModelCollection.Find(x => x.CardId == oldCardId).FirstOrDefaultAsync();
         if (oldCard == null || oldCard.CardStar >= 5)
         {
-            return "";
+            return null;
         }
         var filter = Builders<CardModel>.Filter.And(
             Builders<CardModel>.Filter.Eq("CardStar", oldCard.CardStar + 1),
@@ -65,54 +65,66 @@ public class CardService : ICardService
             Builders<CardModel>.Filter.Eq("CardRarity", oldCard.CardRarity)
         );
         var newCard = await _cardModelCollection.Find(filter).FirstOrDefaultAsync();
+        if (newCard is null)
+        {
+            return null;
+        }
         return newCard.CardId;
     }
 
     private async Task<string?> CalculateRandomCard(List<int> rateList)
     {
         var rand = new Random();
-        var rarity = rand.Next(1, 101); // generate a random number between 1 and 100
+        var rarity = rand.Next(1, rateList.Sum() + 1); // generate a random number between 1 and 100
 
-        var filter = Builders<CardModel>.Filter.And(
-            Builders<CardModel>.Filter.Eq("CardStar", 0),
-            Builders<CardModel>.Filter.Eq("CardRarity", 1) // default value if none of the other conditions are met
-        );
+        FilterDefinition<CardModel> filter;
 
         if (rarity <= rateList[0])
         {
             filter = Builders<CardModel>.Filter.And(
                 Builders<CardModel>.Filter.Eq("CardStar", 0),
-                Builders<CardModel>.Filter.Eq("CardRarity", 1)
+                Builders<CardModel>.Filter.Eq("CardRarity", RarityCard.Common)
             );
         }
-        else if (rarity <= rateList[1] + rateList[0] )
+        else if (rarity <= (rateList[1] + rateList[0]) )
         {
             filter = Builders<CardModel>.Filter.And(
                 Builders<CardModel>.Filter.Eq("CardStar", 0),
-                Builders<CardModel>.Filter.Eq("CardRarity", 2)
+                Builders<CardModel>.Filter.Eq("CardRarity", RarityCard.Rare)
+            );
+        }
+        else if (rarity <= (rateList[1] + rateList[0] + rateList[2]))
+        {
+            filter = Builders<CardModel>.Filter.And(
+                Builders<CardModel>.Filter.Eq("CardStar", 0),
+                Builders<CardModel>.Filter.Eq("CardRarity", RarityCard.Mythic)
             );
         }
         else
         {
             filter = Builders<CardModel>.Filter.And(
                 Builders<CardModel>.Filter.Eq("CardStar", 0),
-                Builders<CardModel>.Filter.Eq("CardRarity", 3)
+                Builders<CardModel>.Filter.Eq("CardRarity", RarityCard.Legend)
             );
         }
 
-        var document = await _cardModelCollection.Find(filter).Limit(1).FirstOrDefaultAsync();
-        return document.CardId;
+        var document = await _cardModelCollection.Find(filter).ToListAsync();
+        var randomNumber = rand.Next(0, document.Count);
+        return document[randomNumber].CardId;
+        
+        
+        
     }
 
     public async Task<CardModel?> GetCard(string cardId) =>
        await _cardModelCollection.Find(x => x.CardId == cardId).FirstOrDefaultAsync();
 
-    public async Task<string> GetUpgradedCardId(string cardId)
+    public async Task<string?> GetUpgradedCardId(string cardId)
     {
         return await CalculateNextCardLevel(cardId);
     }
 
-    public async Task<string?> GenerateCardId(int packType) 
+    public async Task<string?> GenerateCardId(GachaType packType) 
     {
         var rateList = GetRateList(packType);
         return await CalculateRandomCard(rateList);
