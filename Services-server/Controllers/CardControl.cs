@@ -53,26 +53,30 @@ public class CardControl : ControllerBase
             return NotFound();
         }
 
-        if (!user.cardListID.Contains(oldCardId))
+        if (user.cardListID != null && !user.cardListID.Contains(oldCardId))
         {
             return BadRequest("Error when trying to get card info");
         }
 
         var oldCard = await _cardService.GetCard(oldCardId);
 
-        var price = GetUpdatePrice(oldCard.CardStar);
-        if (user.gold < price)
+        if (oldCard != null)
         {
-            return BadRequest("Not enough gold for this transaction!");
-        }
-        var newCardId = await _cardService.GetUpgradedCardId(oldCardId);
+            var price = GetUpdatePrice(oldCard.CardStar);
+            if (user.gold < price)
+            {
+                return BadRequest("Not enough gold for this transaction!");
+            }
+            var newCardId = await _cardService.GetUpgradedCardId(oldCardId);
 
-        if (newCardId is null)
-        {
-            return BadRequest("The card is max level");
+            if (newCardId is null)
+            {
+                return BadRequest("The card is max level");
+            }
+            await _userService.UpgradeCard(userId, oldCardId, newCardId);
+            await _userService.UpdateGold(userId, user.gold - price);
         }
-        await _userService.UpgradeCard(userId, oldCardId, newCardId);
-        await _userService.UpdateGold(userId, user.gold - price);
+
         return Ok(await _userService.GetUserByUserIdAsync(userId));
     }
 

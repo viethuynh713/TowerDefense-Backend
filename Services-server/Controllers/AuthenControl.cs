@@ -10,18 +10,22 @@ namespace Service.Controllers;
 public class AuthenControl : ControllerBase
 {
     private readonly IUserService _userService;
+    private Dictionary<string, string> _dictionaryOTP;
 
-    public AuthenControl(UserService userService) =>
+    public AuthenControl(UserService userService)
+    {
         _userService = userService;
+        _dictionaryOTP = new Dictionary<string, string>();
+    }
 
     [HttpGet]
     public async Task<List<UserModel>> GetAll() =>
         await _userService.GetAllUsersAsync();
 
-    [HttpGet]
-    [Route("delete")]
-    public async Task Delete(string userId) =>
-        await _userService.RemoveAsync(userId);
+    // [HttpGet]
+    // [Route("delete")]
+    // public async Task Delete(string userId) =>
+    //     await _userService.RemoveAsync(userId);
 
     [HttpPost]
     [Route("register")]
@@ -76,25 +80,54 @@ public class AuthenControl : ControllerBase
         return Ok(user);
     }
 
-    [HttpPost]
-    [Route("resetpw")]
-    public async Task<IActionResult> ChangePassword(string email, string oldPassword, string newPassword)
+    [HttpPut]
+    [Route("reset-password")]
+    public async Task<IActionResult> ResetPassword(string email, string newPassword)
     {
-        var oldUser = await _userService.GetUserByEmailAsync(email);
+        var user = await _userService.GetUserByEmailAsync(email);
 
-        if (oldUser is null)
+        if (user is null)
         {
             return NotFound();
         }
 
-        if (oldUser.password != oldPassword)
-        {
-            return BadRequest("Wrong password");
-        }    
-
         await _userService.ChangePassword(email, newPassword);
-
         return Ok();
     }
 
+    [HttpGet]
+    [Route("send-otp")]
+    public async Task<ActionResult> SendOTP(string email)
+    {
+        var user = await _userService.GetUserByEmailAsync(email);
+        // TODO: Gen OTP
+        var otp = "1";
+        
+        // TODO: Send otp to email
+        // TODO: Save OTP  to _dictionaryOTP
+        if (_dictionaryOTP.ContainsKey(email))
+        {
+            _dictionaryOTP[email] = otp;
+            
+        }
+        else
+        {
+            _dictionaryOTP.Add(email,otp);
+        }
+
+        return Ok("");
+    }
+    [HttpPost]
+    [Route("valid-otp")]
+    public Task<ActionResult> IsValidOTP(string email, string otp)
+    {
+        if (_dictionaryOTP.ContainsKey(email))
+        {
+            if (_dictionaryOTP[email] == otp)
+            {
+                return Task.FromResult<ActionResult>(Ok());
+            }
+        }
+        return Task.FromResult<ActionResult>(BadRequest());
+    }
 }

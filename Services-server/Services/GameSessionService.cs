@@ -28,7 +28,7 @@ public class GameSessionService : IGameSessionService
         await _gameSessionModelCollection.DeleteOneAsync(x => x.sessionId == sessionId);
 
     public async Task CreateAsync(GameSessionModel newGameSession) =>
-        await _gameSessionModelCollection.InsertOneAsync(newGameSession);
+        await _gameSessionModelCollection?.InsertOneAsync(newGameSession)!;
     // Get User method
 
     public async Task<List<GameSessionModel>?> GetGameSessionBySessionIdAsync(string userId) =>

@@ -109,7 +109,7 @@ public class UserService : IUserService
         var filter = Builders<UserModel>.Filter.Eq(x => x.userId, userId);
         var user = await _userModelCollection.Find(filter).FirstOrDefaultAsync();
         var list = user.cardListID;
-        list.Add(newCardId);
+        list?.Add(newCardId);
 
         var update = Builders<UserModel>.Update
             .Set(x => x.cardListID, list);
