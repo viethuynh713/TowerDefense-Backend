@@ -8,9 +8,9 @@ namespace Service.Controllers;
 [Route("api/[controller]")]
 public class CardControl : ControllerBase
 {
-    public readonly IUserService _userService;
+    private readonly IUserService _userService;
 
-    public readonly ICardService _cardService;
+    private readonly ICardService _cardService;
 
     public CardControl(UserService userService, CardService cardService)
     {

@@ -21,7 +21,7 @@ public class UserControl : ControllerBase
        
 
     [HttpPost]
-    [Route("updatenickname")]
+    [Route("update-nickname")]
     public async Task<IActionResult> UpdateNickName(string userId, string newName)
     {
         if (!await _userService.IsNickNameValid(newName)) 
@@ -42,7 +42,7 @@ public class UserControl : ControllerBase
     }
 
     [HttpPost]
-    [Route("addgold")]
+    [Route("add-gold")]
     public async Task<IActionResult> AddGold(string userId, int addedGold)
     {
         var user = await _userService.GetUserByUserIdAsync(userId);
@@ -59,7 +59,7 @@ public class UserControl : ControllerBase
         return Ok(newGold);
     }
     [HttpPost]
-    [Route("creategamesession")]
+    [Route("create-gamesession")]
     public async Task<IActionResult> CreateGameSession(DateTime startTime, DateTime finishTime, float totalTime, string playerA, string playerB, List<int> listCard, string playerWin)
     {
         var gameSessionModel = new GameSessionModel {
@@ -78,7 +78,7 @@ public class UserControl : ControllerBase
     }
 
     [HttpGet]
-    [Route("getgamesession")]
+    [Route("get-gamesession")]
     public async Task<IActionResult> GetGameSession(string userId)
     {
         var gameSession = await _gameSessionService.GetGameSessionBySessionIdAsync(userId);

@@ -79,7 +79,18 @@ public class AuthenControl : ControllerBase
         }
         return Ok(user);
     }
+    [HttpGet]
+    [Route("login-id")]
+    public async Task<IActionResult> LoginById(string userId)
+    {
+        var user = await _userService.GetUserByUserIdAsync(userId);
+        if (user is null)
+        {
+            return NotFound("The user does not exist");
+        }
 
+        return Ok(user);
+    }
     [HttpPut]
     [Route("reset-password")]
     public async Task<IActionResult> ResetPassword(string email, string newPassword)
