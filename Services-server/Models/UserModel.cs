@@ -14,6 +14,8 @@ namespace Service.Models
         public string userId { get; set; } = null!;
         public string? nickName { get; set; }
         public int gold { get; set; } = 0;
+        
+        public int rank { get; set; } = 0;
         public List<string>? cardListID { get; set; }
         public List<string>? friendListID { get; set; }
 
