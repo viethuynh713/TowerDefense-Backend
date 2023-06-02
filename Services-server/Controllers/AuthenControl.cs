@@ -10,12 +10,11 @@ namespace Service.Controllers;
 public class AuthenControl : ControllerBase
 {
     private readonly IUserService _userService;
-    private Dictionary<string, string> _dictionaryOTP;
+    private static Dictionary<string, string>? _dictionaryOTP = new Dictionary<string, string>();
 
     public AuthenControl(UserService userService)
     {
         _userService = userService;
-        _dictionaryOTP = new Dictionary<string, string>();
     }
 
     [HttpGet]
@@ -110,21 +109,21 @@ public class AuthenControl : ControllerBase
     [Route("send-otp")]
     public async Task<ActionResult> SendOTP(string email)
     {
+        if (!_userService.IsValidEmail(email))
+        {
+            return BadRequest("Wrong email format !");
+        }
         var user = await _userService.GetUserByEmailAsync(email);
-        // TODO: Gen OTP
-        var otp = "1";
-        
-        // TODO: Send otp to email
-        // TODO: Save OTP  to _dictionaryOTP
-        if (_dictionaryOTP.ContainsKey(email))
+        if (user is null)
         {
-            _dictionaryOTP[email] = otp;
-            
+            return BadRequest("Your email isn't match with any Mythic Empire's accounts !");
         }
-        else
-        {
-            _dictionaryOTP.Add(email,otp);
-        }
+
+        Random random = new Random();
+        int otpValue = random.Next(0, 1000000);
+        string otp = otpValue.ToString("D6");
+
+        _userService.SendOTP(email, otp);
 
         return Ok("");
     }
@@ -132,13 +131,11 @@ public class AuthenControl : ControllerBase
     [Route("valid-otp")]
     public Task<ActionResult> IsValidOTP(string email, string otp)
     {
-        if (_dictionaryOTP.ContainsKey(email))
-        {
-            if (_dictionaryOTP[email] == otp)
-            {
-                return Task.FromResult<ActionResult>(Ok());
-            }
+        if (_userService.IsValidOTP(email, otp)) 
+        { 
+            return Task.FromResult<ActionResult>(Ok());
         }
-        return Task.FromResult<ActionResult>(BadRequest());
+
+        return Task.FromResult<ActionResult>(BadRequest("Your OTP code isn't valid"));
     }
 }

@@ -12,7 +12,7 @@ namespace Service.Models
         public string email { get; set; } = null!;
         public string password { get; set; } = null!;
         public string userId { get; set; } = null!;
-        public string? nickName { get; set; }
+        public string nickName { get; set; } = null!;
         public int gold { get; set; } = 0;
         
         public int rank { get; set; } = 0;

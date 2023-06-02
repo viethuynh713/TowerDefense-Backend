@@ -28,6 +28,9 @@ namespace Service.Services
         Task UpgradeCard(string userId, string oldCardId, string? newCardId);
 
         Task AddCard(string userId, string newCardId);
-        
+
+        void SendOTP(string email, string otp);
+
+        bool IsValidOTP(string email, string otpCode);
     }
 }
