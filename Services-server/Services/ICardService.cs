@@ -15,5 +15,7 @@ namespace Service.Services
         Task<string?> GetUpgradedCardId(string cardId);
 
         Task<string?> GenerateCardId(GachaType packType);
+
+        Task<List<string>> GetInitCardIdAsync();
     }
 }
