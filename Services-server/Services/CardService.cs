@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System;
 
 namespace Service.Services;
 
@@ -129,6 +130,31 @@ public class CardService : ICardService
         var rateList = GetRateList(packType);
         return await CalculateRandomCard(rateList);
     }
-    
+
+    public async Task<List<string>> GetInitCardIdAsync()
+    {
+        FilterDefinition<CardModel> filter = Builders<CardModel>.Filter.And(
+                Builders<CardModel>.Filter.Eq("CardStar", 0),
+                Builders<CardModel>.Filter.Eq("CardRarity", RarityCard.Common)
+            );
+
+        var document = await _cardModelCollection.Find(filter).ToListAsync();  
+        Random random = new Random();
+        List<string> selectedCardId = new List<string>();
+
+        while (selectedCardId.Count < 4)
+        {
+            int rndIdx = random.Next(document.Count);
+            var selectedElement = document[rndIdx].CardId;
+            if (selectedElement != null && !selectedCardId.Contains(selectedElement))
+            {
+                selectedCardId.Add(selectedElement);
+            } 
+        }    
+
+        return selectedCardId;
+    }
+
+
 }
 

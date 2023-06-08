@@ -10,10 +10,14 @@ namespace Service.Controllers;
 public class AuthenControl : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ICardService _cardService;
+    private Dictionary<string, string> _dictionaryOTP;
 
-    public AuthenControl(UserService userService)
+    public AuthenControl(UserService userService, CardService cardService)
     {
         _userService = userService;
+        _cardService = cardService;
+        _dictionaryOTP = new Dictionary<string, string>();
     }
 
     [HttpGet]
@@ -41,6 +45,8 @@ public class AuthenControl : ControllerBase
             return BadRequest("This email is already used !");
         }
 
+        var initCard = await _cardService.GetInitCardIdAsync();
+
         var newUser = new UserModel
         {
             email = email,
@@ -48,7 +54,7 @@ public class AuthenControl : ControllerBase
             userId = Guid.NewGuid().ToString(),
             nickName = nickName,
             gold = 0,
-            cardListID = new List<string>(), //todo: 4 card (CardStar = 0, CardRarity = 1)
+            cardListID = initCard, //todo: 4 card (CardStar = 0, CardRarity = 1)
             friendListID = new List<string>()
         };
 
