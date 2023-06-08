@@ -21,8 +21,8 @@ public class UserControl : ControllerBase
        
 
     [HttpPost]
-    [Route("update-nickname")]
-    public async Task<IActionResult> UpdateNickName(string userId, string newName)
+    [Route("update-nickname/{userId}")]
+    public async Task<IActionResult> UpdateNickName(string userId, [FromForm]string newName)
     {
         if (!await _userService.IsNickNameValid(newName)) 
         {

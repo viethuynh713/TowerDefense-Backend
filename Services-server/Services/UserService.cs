@@ -189,16 +189,10 @@ public class UserService : IUserService
 
     public bool IsValidOTP(string email, string otpCode)
     {
-        if(!_dictionaryOTP.ContainsKey(email))
+        if(_dictionaryOTP.ContainsKey(email) && _dictionaryOTP[email] == otpCode)
         {
-            return false;
+            return true;
         }
-        
-        if (_dictionaryOTP[email] == otpCode)
-        { 
-            return true; 
-        }
-
         return false;
     }
     private void RemoveOldOTP(string email, string otpCode)
@@ -208,7 +202,7 @@ public class UserService : IUserService
             if (_dictionaryOTP[email] == otpCode)
             {
                 _dictionaryOTP.Remove(email);
-                Console.WriteLine("Removed " + email + " with OTP code: " + otpCode);
+                // Console.WriteLine("Removed " + email + " with OTP code: " + otpCode);
             }
         }
     }

@@ -10,7 +10,6 @@ namespace Service.Controllers;
 public class AuthenControl : ControllerBase
 {
     private readonly IUserService _userService;
-    private static Dictionary<string, string>? _dictionaryOTP = new Dictionary<string, string>();
 
     public AuthenControl(UserService userService)
     {
@@ -20,12 +19,7 @@ public class AuthenControl : ControllerBase
     [HttpGet]
     public async Task<List<UserModel>> GetAll() =>
         await _userService.GetAllUsersAsync();
-
-    // [HttpGet]
-    // [Route("delete")]
-    // public async Task Delete(string userId) =>
-    //     await _userService.RemoveAsync(userId);
-
+    
     [HttpPost]
     [Route("register")]
     public async Task<IActionResult> Register(string email, string nickName, string password)
@@ -94,12 +88,12 @@ public class AuthenControl : ControllerBase
     [Route("reset-password")]
     public async Task<IActionResult> ResetPassword(string email, string newPassword)
     {
-        var user = await _userService.GetUserByEmailAsync(email);
+        // var user = await _userService.GetUserByEmailAsync(email);
 
-        if (user is null)
-        {
-            return NotFound();
-        }
+        // if (user is null)
+        // {
+        //     return NotFound("Not fo");
+        // }
 
         await _userService.ChangePassword(email, newPassword);
         return Ok();
@@ -129,7 +123,7 @@ public class AuthenControl : ControllerBase
     }
     [HttpPost]
     [Route("valid-otp")]
-    public Task<ActionResult> IsValidOTP(string email, string otp)
+    public Task<ActionResult> IsValidOtp(string email, string otp)
     {
         if (_userService.IsValidOTP(email, otp)) 
         { 
