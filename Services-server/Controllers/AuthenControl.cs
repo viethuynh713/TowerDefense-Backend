@@ -11,13 +11,11 @@ public class AuthenControl : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly ICardService _cardService;
-    private Dictionary<string, string> _dictionaryOTP;
 
     public AuthenControl(UserService userService, CardService cardService)
     {
         _userService = userService;
         _cardService = cardService;
-        _dictionaryOTP = new Dictionary<string, string>();
     }
 
     [HttpGet]
@@ -53,8 +51,8 @@ public class AuthenControl : ControllerBase
             password = password,
             userId = Guid.NewGuid().ToString(),
             nickName = nickName,
-            gold = 0,
-            cardListID = initCard, //todo: 4 card (CardStar = 0, CardRarity = 1)
+            gold = 500,
+            cardListID = initCard, 
             friendListID = new List<string>()
         };
 
@@ -94,12 +92,12 @@ public class AuthenControl : ControllerBase
     [Route("reset-password")]
     public async Task<IActionResult> ResetPassword(string email, string newPassword)
     {
-        // var user = await _userService.GetUserByEmailAsync(email);
-
-        // if (user is null)
-        // {
-        //     return NotFound("Not fo");
-        // }
+        var user = await _userService.GetUserByEmailAsync(email);
+    
+        if (user is null)
+        {
+            return NotFound("Not found");
+        }
 
         await _userService.ChangePassword(email, newPassword);
         return Ok();
@@ -107,7 +105,7 @@ public class AuthenControl : ControllerBase
 
     [HttpGet]
     [Route("send-otp")]
-    public async Task<ActionResult> SendOTP(string email)
+    public async Task<ActionResult> SendOtp(string email)
     {
         if (!_userService.IsValidEmail(email))
         {
