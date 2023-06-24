@@ -4,14 +4,15 @@ using Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Todo
 builder.Services.Configure<DatabaseSettings>(
-    builder.Configuration.GetSection("MythicEmpire"));
+builder.Configuration.GetSection("MythicEmpire"));
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<CardService>();
 builder.Services.AddSingleton<GameSessionService>();
 
-
+// Register Lambda to replace Kestrel as the web server for the ASP.NET Core application.
+// If the application is not running in Lambda then this method will do nothing. 
+builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 
 // End todo
 
@@ -25,11 +26,8 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
