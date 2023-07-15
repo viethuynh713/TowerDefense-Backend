@@ -14,6 +14,9 @@ namespace Service.Models
         public string? CardId { get; set; }
 
         public string? CardName { get; set; }
+
+        public int Energy { get; set; }
+
         [Range(0, 5)]
         public int CardStar { get; set; }
         public CardType TypeOfCard { get; set; }
