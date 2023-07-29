@@ -60,20 +60,10 @@ public class UserControl : ControllerBase
     }
     [HttpPost]
     [Route("create-gamesession")]
-    public async Task<IActionResult> CreateGameSession(DateTime startTime, DateTime finishTime, float totalTime, string playerA, string playerB, List<int> listCard, string playerWin)
+    public async Task<IActionResult> CreateGameSession([FromBody]GameSessionModel gameModel)
     {
-        var gameSessionModel = new GameSessionModel {
-            sessionId = Guid.NewGuid().ToString(),
-            startTime = startTime,
-            finishTime = finishTime,
-            totalTime = totalTime,
-            playerA = playerA, 
-            playerB = playerB,
-            listCardPlayerA = listCard.Take(8).ToList(),
-            listCardPlayerB = listCard.Skip(Math.Max(0, listCard.Count - 8)).ToList(),
-            playerWin = playerWin
-        };
-        await _gameSessionService.CreateAsync(gameSessionModel);
+        if (gameModel == null) return BadRequest();
+        await _gameSessionService.CreateAsync(gameModel);
         return Ok();
     }
 
