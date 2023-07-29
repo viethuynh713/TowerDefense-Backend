@@ -29,6 +29,8 @@ namespace Service.Services
 
         Task AddCard(string userId, string newCardId);
 
+        Task UpdateRank(string userId, int newRank);
+
         void SendOTP(string email, string otp);
 
         bool IsValidOTP(string email, string otpCode);

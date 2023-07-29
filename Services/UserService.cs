@@ -98,6 +98,14 @@ public class UserService : IUserService
 
         await _userModelCollection.UpdateOneAsync(filter, update);
     }
+    public async Task UpdateRank(string userId, int newRank)
+    {
+        var filter = Builders<UserModel>.Filter.Eq(x => x.userId, userId);
+        var update = Builders<UserModel>.Update
+            .Set(x => x.rank, newRank);
+
+        await _userModelCollection.UpdateOneAsync(filter, update);
+    }
 
     public async Task UpgradeCard(string userId, string oldCardId, string? newCardId)
     {
