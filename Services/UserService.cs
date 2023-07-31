@@ -184,7 +184,7 @@ public class UserService : IUserService
         mail.HeadersEncoding = Encoding.UTF8;
         try
         {
-            client.Send(mail);
+            client.SendMailAsync(mail);
         }
         catch (Exception ex)
         {
