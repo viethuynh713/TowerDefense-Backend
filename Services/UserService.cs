@@ -134,7 +134,7 @@ public class UserService : IUserService
         await _userModelCollection.UpdateOneAsync(filter, update);
     }
 
-    public async void SendOTP(string email, string otpCode)
+    public async Task SendOTP(string email, string otpCode)
     {
         string senderEmail = "no.reply.mythicempire@gmail.com";
         string senderPassword = "ppwoaslpjefvayhk";

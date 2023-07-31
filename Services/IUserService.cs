@@ -31,7 +31,7 @@ namespace Service.Services
 
         Task UpdateRank(string userId, int newRank);
 
-        void SendOTP(string email, string otp);
+        Task SendOTP(string email, string otp);
 
         bool IsValidOTP(string email, string otpCode);
     }
