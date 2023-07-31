@@ -121,7 +121,7 @@ public class AuthenControl : ControllerBase
         int otpValue = random.Next(0, 1000000);
         string otp = otpValue.ToString("D6");
 
-        _userService.SendOTP(email, otp);
+        await _userService.SendOTP(email, otp);
 
         return Ok("");
     }
