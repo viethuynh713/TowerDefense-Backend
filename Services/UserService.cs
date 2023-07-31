@@ -171,11 +171,13 @@ public class UserService : IUserService
         timer.Elapsed += (sender, e) => TimerElapsed(sender, e, email, otpCode);
         timer.Start();
 
-        SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
+        SmtpClient client = new SmtpClient("smtp.gmail.com");
         client.DeliveryMethod = SmtpDeliveryMethod.Network;
         client.EnableSsl = true;
         client.UseDefaultCredentials = false;
         client.Credentials = new System.Net.NetworkCredential(senderEmail, senderPassword);
+        client.Timeout = 100;
+        client.Port = 587;
 
         MailMessage mail = new MailMessage(senderEmail, email, subject, body);
         mail.BodyEncoding = Encoding.UTF8;
