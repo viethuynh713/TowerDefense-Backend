@@ -177,14 +177,14 @@ public class UserService : IUserService
         client.UseDefaultCredentials = false;
         client.Credentials = new System.Net.NetworkCredential(senderEmail, senderPassword);
         client.Timeout = 20000;
-        client.Port = 25;
+        client.Port = 465;
 
         MailMessage mail = new MailMessage(senderEmail, email, subject, body);
         mail.BodyEncoding = Encoding.UTF8;
         mail.HeadersEncoding = Encoding.UTF8;
         try
         {
-            client.SendMailAsync(mail);
+            await client.SendMailAsync(mail);
         }
         catch (Exception ex)
         {
