@@ -177,7 +177,7 @@ public class UserService : IUserService
         client.UseDefaultCredentials = false;
         client.Credentials = new System.Net.NetworkCredential(senderEmail, senderPassword);
         client.Timeout = 20000;
-        client.Port = 587;
+        client.Port = 25;
 
         MailMessage mail = new MailMessage(senderEmail, email, subject, body);
         mail.BodyEncoding = Encoding.UTF8;
