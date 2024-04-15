@@ -17,6 +17,5 @@ Mythic Empire là một dự án backend được xây dựng bằng ASP.Net Cor
 Chúng tôi rất hoan nghênh mọi đóng góp từ cộng đồng. Hãy tạo một Pull Request để đóng góp vào dự án này.
 
 ## Tác Giả
-Tên: [Your Name]
 Liên Hệ: viethuynh713@gmail.com
 
